@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import HtmlContent from './components/HtmlContent.jsx'
 import CodeChecker from './components/CodeChecker.jsx'
 import { pages } from './data/pages.js'
-import { getSlug, navigate } from './router.js'
+import { getSlug, navigate, toHref } from './router.js'
 
 const MATA_KULIAH = [
   { slug: 'agama-islam', icon: '🕌', label: 'Agama Islam' },
@@ -20,7 +20,7 @@ function NavItem({ item, slug, onNavigate }) {
   return (
     <li>
       <a
-        href={`/${item.slug}`}
+        href={toHref(`/${item.slug}`)}
         className={slug === item.slug ? 'aktif' : ''}
         onClick={(event) => {
           event.preventDefault()
@@ -56,7 +56,7 @@ export default function App() {
   }, [slug])
 
   function goTo(path) {
-    if (path === window.location.pathname + window.location.search + window.location.hash) return
+    if (toHref(path) === window.location.pathname + window.location.search + window.location.hash) return
     navigate(path)
     setSlug(getSlug())
     setSemester(1)
@@ -81,7 +81,7 @@ export default function App() {
         <ul className="sidebar-nav">
           <li>
             <a
-              href="/"
+              href={toHref('/')}
               className={slug === 'home' ? 'aktif' : ''}
               onClick={(event) => {
                 event.preventDefault()
@@ -130,7 +130,7 @@ export default function App() {
             <span>Beranda</span>
           ) : (
             <>
-              <a href="/" onClick={(event) => { event.preventDefault(); goTo('/') }}>Beranda</a> / <span>{judul}</span>
+              <a href={toHref('/')} onClick={(event) => { event.preventDefault(); goTo('/') }}>Beranda</a> / <span>{judul}</span>
             </>
           )}
         </nav>

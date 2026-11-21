@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react'
-import { navigate } from '../router.js'
+import { BASE, navigate, toHref } from '../router.js'
 
 const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])
 const SKIP_TAGS = new Set(['script', 'style', 'link', 'meta', 'title'])
@@ -26,7 +26,9 @@ function toElement(node, key) {
   for (const attr of node.attributes) {
     if (attr.name.startsWith('on')) continue
     const name = ATTR_NAMES[attr.name] || attr.name
-    props[name] = attr.value
+    props[name] = name === 'href' && attr.value.startsWith('/') && !attr.value.startsWith('//')
+      ? toHref(attr.value)
+      : attr.value
   }
 
   if (VOID_TAGS.has(tag)) return React.createElement(tag, props)
@@ -99,9 +101,10 @@ export default function HtmlContent({ html, onTabChange }) {
         return
       }
 
-      if (/^\/[a-z0-9-]*\/?$/.test(href)) {
+      const localPath = BASE !== '/' && href.startsWith(BASE) ? href.slice(BASE.length - 1) : href
+      if (/^\/[a-z0-9-]*\/?$/.test(localPath)) {
         event.preventDefault()
-        navigate(href)
+        navigate(localPath)
       }
     }
 
